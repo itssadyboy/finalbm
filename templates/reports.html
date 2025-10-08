@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-chart-bar"></i> Reports</h1>
+        <p class="lead">View production and sale reports</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cogs"></i> Production Reports</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h4>{{ "%.2f"|format(prod_totals.total_length) }}</h4>
+                                <p class="mb-0">Total Length (m)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h4>{{ "%.2f"|format(prod_totals.total_weight) }}</h4>
+                                <p class="mb-0">Total Weight (kg)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h4>{{ prod_totals.total_items }}</h4>
+                                <p class="mb-0">Total Items</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Number</th>
+                                <th>Date</th>
+                                <th>Shift</th>
+                                <th>Operator</th>
+                                <th>Items</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prod in productions %}
+                            <tr>
+                                <td>{{ prod.id }}</td>
+                                <td>{{ prod.number }}</td>
+                                <td>{{ prod.date }}</td>
+                                <td>{{ prod.shift }}</td>
+                                <td>{{ prod.operator_name or 'N/A' }}</td>
+                                <td>
+                                    {% set items_data = prod.data|eval %}
+                                    {{ items_data|length }} items
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> Sale Reports</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h4>₹{{ "%.2f"|format(sale_totals.total_amount) }}</h4>
+                                <p class="mb-0">Total Amount</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h4>{{ sale_totals.total_items }}</h4>
+                                <p class="mb-0">Total Items</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h4>{{ sale_totals.total_orders }}</h4>
+                                <p class="mb-0">Total Orders</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Order No</th>
+                                <th>Date</th>
+                                <th>Party</th>
+                                <th>Items</th>
+                                <th>Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in sales %}
+                            <tr>
+                                <td>{{ sale.id }}</td>
+                                <td>{{ sale.order_no }}</td>
+                                <td>{{ sale.date }}</td>
+                                <td>{{ sale.party_name or 'N/A' }}</td>
+                                <td>
+                                    {% set items_data = sale.data|eval %}
+                                    {{ items_data|length }} items
+                                </td>
+                                <td>
+                                    ₹{{ "%.2f"|format(items_data|sum(attribute='amount')|default(0)) }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

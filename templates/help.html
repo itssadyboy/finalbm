@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-question-circle"></i> Help & System</h1>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> System Information</h5>
+            </div>
+            <div class="card-body">
+                <h6>About SaneX 2.0</h6>
+                <p>SaneX 2.0 is a web-based application for managing production and sales data for manufacturing units.</p>
+                
+                <h6>Features:</h6>
+                <ul>
+                    <li>Masters Management (Operators, Parties, Machines, Items)</li>
+                    <li>Production Entries with multiple items</li>
+                    {% if session.user_role == 'admin' %}
+                    <li>Sale Entries with order management</li>
+                    <li>Comprehensive Reports</li>
+                    <li>Multi-user support with role-based access</li>
+                    {% else %}
+                    <li>User role with production access only</li>
+                    {% endif %}
+                </ul>
+                
+                <h6>Version:</h6>
+                <p>SaneX 2.0 Web Edition</p>
+                
+                <h6>Developed By:</h6>
+                <p>SK Enterprises<br>
+                Contact: #7710525823</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0"><i class="fas fa-book"></i> User Guide</h5>
+            </div>
+            <div class="card-body">
+                <h6>Getting Started:</h6>
+                <ol>
+                    <li>Login with your credentials</li>
+                    <li>Set up Masters first (Operators, Parties, Machines, Items)</li>
+                    <li>Create Production entries</li>
+                    {% if session.user_role == 'admin' %}
+                    <li>Create Sale entries and view reports</li>
+                    {% endif %}
+                </ol>
+                
+                <h6>User Roles:</h6>
+                <ul>
+                    <li><strong>Admin:</strong> Full access to all features</li>
+                    <li><strong>User:</strong> Can only create production entries and manage masters</li>
+                </ul>
+                
+                <h6>Masters Management:</h6>
+                <p>Add all necessary master data before creating entries:</p>
+                <ul>
+                    <li><strong>Operators:</strong> Production staff</li>
+                    <li><strong>Parties:</strong> Customers for sales</li>
+                    <li><strong>Machines:</strong> Production equipment</li>
+                    <li><strong>Items:</strong> Products (mark as Production or Sale type)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Management - Only for Admin -->
+{% if session.user_role == 'admin' %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-users-cog"></i> User Management (Admin Only)</h5>
+            </div>
+            <div class="card-body">
+                <form id="userForm" class="mb-3">
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="newUsername" placeholder="Username" required>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="password" class="form-control" id="newPassword" placeholder="Password" required>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" id="newRole">
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100">Add User</button>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if user.role == 'admin' else 'info' }}">
+                                        {{ user.role }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if user.username != 'Admin' %}
+                                    <button class="btn btn-sm btn-danger delete-user" data-id="{{ user.id }}">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                    {% else %}
+                                    <span class="text-muted">Default Admin</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

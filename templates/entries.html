@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-edit"></i> Entries</h1>
+        <p class="lead">
+            {% if user_role == 'admin' %}
+            Create production and sale entries
+            {% else %}
+            Create production entries
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+<ul class="nav nav-tabs mt-4" id="entriesTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="production-tab" data-bs-toggle="tab" data-bs-target="#production" type="button">
+            <i class="fas fa-cogs"></i> Production Entry
+        </button>
+    </li>
+    
+    <!-- Sale Entry - Only for Admin -->
+    {% if user_role == 'admin' %}
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="sale-tab" data-bs-toggle="tab" data-bs-target="#sale" type="button">
+            <i class="fas fa-shopping-cart"></i> Sale Entry
+        </button>
+    </li>
+    {% endif %}
+</ul>
+
+<div class="tab-content mt-3" id="entriesTabContent">
+    <!-- Production Entry -->
+    <div class="tab-pane fade show active" id="production" role="tabpanel">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-cogs"></i> Production Entry</h5>
+            </div>
+            <div class="card-body">
+                <form id="productionForm">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Number</label>
+                            <input type="text" class="form-control" id="prodNumber" value="{{ next_prod }}" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control" id="prodDate" value="{{ today }}" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Shift</label>
+                            <select class="form-control" id="prodShift" required>
+                                <option value="Morning">Morning</option>
+                                <option value="Evening">Evening</option>
+                                <option value="Night">Night</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Operator</label>
+                            <select class="form-control" id="prodOperator" required>
+                                <option value="">Select Operator</option>
+                                {% for op in operators %}
+                                <option value="{{ op.id }}">{{ op.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6>Production Items</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="productionItemsTable">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Machine</th>
+                                            <th>Length (m)</th>
+                                            <th>Weight (kg)</th>
+                                            <th>Remarks</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productionItemsBody">
+                                        <!-- Items will be added here dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6>Add New Item</h6>
+                            <div class="row g-2">
+                                <div class="col-md-3">
+                                    <select class="form-control" id="prodItem">
+                                        <option value="">Select Item</option>
+                                        {% for item in items %}
+                                        {% if item.type == 'Production' %}
+                                        <option value="{{ item.id }}">{{ item.name }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-control" id="prodMachine">
+                                        <option value="">Select Machine</option>
+                                        {% for mc in machines %}
+                                        <option value="{{ mc.id }}">{{ mc.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" class="form-control" id="prodLength" placeholder="Length" step="0.01">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" class="form-control" id="prodWeight" placeholder="Weight" step="0.01">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control" id="prodRemarks" placeholder="Remarks">
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-success w-100" id="addProdItem">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> Save Production
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sale Entry - Only for Admin -->
+    {% if user_role == 'admin' %}
+    <div class="tab-pane fade" id="sale" role="tabpanel">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> Sale Entry</h5>
+            </div>
+            <div class="card-body">
+                <form id="saleForm">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Order No</label>
+                            <input type="text" class="form-control" id="saleOrderNo" value="{{ next_sale }}" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control" id="saleDate" value="{{ today }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Party</label>
+                            <select class="form-control" id="saleParty" required>
+                                <option value="">Select Party</option>
+                                {% for pt in parties %}
+                                <option value="{{ pt.id }}">{{ pt.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6>Sale Items</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="saleItemsTable">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Quantity</th>
+                                            <th>Rate</th>
+                                            <th>Amount</th>
+                                            <th>Remarks</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="saleItemsBody">
+                                        <!-- Items will be added here dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6>Add New Item</h6>
+                            <div class="row g-2">
+                                <div class="col-md-3">
+                                    <select class="form-control" id="saleItem">
+                                        <option value="">Select Item</option>
+                                        {% for item in items %}
+                                        {% if item.type == 'Sale' %}
+                                        <option value="{{ item.id }}">{{ item.name }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" class="form-control" id="saleQuantity" placeholder="Quantity" step="0.01">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" class="form-control" id="saleRate" placeholder="Rate" step="0.01">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" class="form-control" id="saleAmount" placeholder="Amount" step="0.01" readonly>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control" id="saleRemarks" placeholder="Remarks">
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-success w-100" id="addSaleItem">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-save"></i> Save Sale
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

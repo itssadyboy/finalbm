@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+        <p class="lead">Welcome back, {{ session.username }}!</p>
+        
+        <!-- Role badge -->
+        <span class="badge bg-{% if session.user_role == 'admin' %}danger{% else %}info{% endif %} mb-3">
+            {{ session.user_role|upper }} USER
+        </span>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ prod_totals.total_items }}</h4>
+                        <p class="card-text">Production Items</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-cogs fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if session.user_role == 'admin' %}
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ sale_totals.total_orders }}</h4>
+                        <p class="card-text">Sale Orders</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-shopping-cart fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ operators|length }}</h4>
+                        <p class="card-text">Operators</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ parties|length }}</h4>
+                        <p class="card-text">Parties</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-handshake fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-{% if session.user_role == 'admin' %}8{% else %}12{% endif %}">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cogs"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-{% if session.user_role == 'admin' %}6{% else %}4{% endif %}">
+                        <a href="{{ url_for('entries') }}" class="btn btn-primary w-100 btn-lg">
+                            <i class="fas fa-plus"></i> New Production Entry
+                        </a>
+                    </div>
+                    
+                    {% if session.user_role == 'admin' %}
+                    <div class="col-md-6">
+                        <a href="{{ url_for('entries') }}" class="btn btn-success w-100 btn-lg">
+                            <i class="fas fa-shopping-cart"></i> New Sale Entry
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="col-md-{% if session.user_role == 'admin' %}6{% else %}4{% endif %}">
+                        <a href="{{ url_for('masters') }}" class="btn btn-info w-100 btn-lg">
+                            <i class="fas fa-database"></i> Manage Masters
+                        </a>
+                    </div>
+                    
+                    {% if session.user_role == 'admin' %}
+                    <div class="col-md-6">
+                        <a href="{{ url_for('reports') }}" class="btn btn-warning w-100 btn-lg">
+                            <i class="fas fa-chart-bar"></i> View Reports
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="col-md-4">
+                        <a href="{{ url_for('help') }}" class="btn btn-secondary w-100 btn-lg">
+                            <i class="fas fa-question-circle"></i> Help
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if session.user_role == 'admin' %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> System Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>User:</strong> {{ session.username }} ({{ session.user_role }})</p>
+                <p><strong>System Status:</strong> <span class="badge bg-success">Operational</span></p>
+                <p><strong>Total Production:</strong> {{ prod_totals.total_items }} items</p>
+                <p><strong>Total Sales:</strong> {{ sale_totals.total_orders }} orders</p>
+                <hr>
+                <small class="text-muted">
+                    SaneX 2.0 - Blueman Industries<br>
+                    For support contact: SK Enterprises - #7710525823
+                </small>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- User-specific information -->
+{% if session.user_role == 'user' %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-user"></i> User Permissions</h5>
+            </div>
+            <div class="card-body">
+                <p>As a <strong>User</strong>, you have access to:</p>
+                <ul>
+                    <li>View Dashboard</li>
+                    <li>Manage Masters (Operators, Parties, Machines, Items)</li>
+                    <li>Create Production Entries</li>
+                    <li>Access Help Documentation</li>
+                </ul>
+                <p class="text-muted mb-0">
+                    <small>For additional permissions, please contact your administrator.</small>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
